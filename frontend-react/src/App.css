@@ -1,0 +1,90 @@
+* {
+  box-sizing: border-box;
+  font-family: Calibri, 'Calibri', 'Times New Roman', serif;
+  font-size: 1rem;
+}
+
+.main-container {
+  width: 100vw; height: 100vh;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.article {
+  position: relative;
+  width: 500px;
+  border: 1px solid #111;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.article-id {
+  position: absolute;
+  top: 0; right: 0px;
+  min-width: 30px;
+  padding: 0 5px;
+  background-color: #111;
+  color: #eee;
+  text-align: right;
+}
+
+input[type="text"], textarea, select {
+  width: 100%;
+}
+
+textarea {
+  height: 20rem;
+}
+
+select {
+  padding: 5px;
+}
+
+.filter-container {
+  border: 1px solid #111;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.error-popup {
+  user-select: none;
+  right: 20px; bottom: 20px;
+  position: absolute;
+  padding: 20px;
+  background-color: rgb(255, 63, 63);
+  color: #fff;
+}
+
+.bold {
+  font-weight: 800;
+}
+
+.button-section {
+  height: 40px;
+  margin-top: 20px;
+  padding: 5px;
+  background-color: rgb(120, 120, 120);
+  background: linear-gradient(90deg, rgba(120,120,120,1) 0%, rgba(0,0,0,0) 100%);
+}
+
+button {
+  height: 30px;
+  border: none;
+  padding: 5px 10px;
+}
+
+button:hover {
+  outline: 2px solid #000;
+  cursor: pointer;
+}
+
+button + button {
+  margin-left: 5px;
+}
+
+a {
+  color: #eee;
+  text-decoration: none;
+}
