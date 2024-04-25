@@ -5,16 +5,25 @@ let articles = [];
 let editMode = false;
 let editedArticleId = null;
 
+let genericError = "Something went wrong. Please try again later.";
+
 const getArticles = async () => {
-  await fetch(baseURL).then((res) =>
-    res.json().then((json) => {
-      articles = json;
-      refreshArticles();
-    })
-  );
+  const data = await fetch(baseURL);
+  const json = await data.json();
+  return json;
 };
 
-getArticles();
+// Load the articles when the page is loaded
+(async () => {
+  try {
+    await getArticles().then((data) => {
+      articles = data;
+      refreshArticles();
+    });
+  } catch (e) {
+    window.alert(genericError);
+  }
+})();
 
 const addParagraph = (content, className) => {
   let newParagraph = document.createElement("p");
@@ -26,6 +35,7 @@ const addParagraph = (content, className) => {
 const generateArticleDiv = (article) => {
   // Create DOM elements
   let articleDiv = document.createElement("div");
+  articleDiv.dataset.articleId = article.id;
   articleDiv.className = "article";
   let title = document.createElement("p");
   let body = document.createElement("p");
@@ -49,15 +59,20 @@ const generateArticleDiv = (article) => {
     published.value = article.published;
     published.disabled = true;
   }
-  publishedDiv.appendChild(published);
   title.dataset.articleId = article.id;
   body.dataset.articleId = article.id;
   published.dataset.articleId = article.id;
+  title.className = "title";
+  body.className = "body";
+  published.className = "published";
+  publishedDiv.appendChild(published);
 
   // Buttons section
   let buttonsSection = document.createElement("div");
   let editButton = document.createElement("button");
   editButton.textContent = "Edit";
+  editButton.className = "btn btn-edit";
+  editButton.id = `btn-edit-${article.id}`;
   editButton.addEventListener("click", () => {
     editMode = true;
     editedArticleId = article.id;
@@ -66,15 +81,31 @@ const generateArticleDiv = (article) => {
 
   let removeButton = document.createElement("button");
   removeButton.textContent = "Remove";
-  removeButton.addEventListener("click", () => {
+  removeButton.className = "btn btn-remove";
+  removeButton.id = `btn-remove-${article.id}`;
+  removeButton.addEventListener("click", async () => {
     if (window.confirm("Are you sure you want to remove this article?")) {
-      removeArticle(article);
+      try {
+        await removeArticle(article).then((res) => {
+          if (res.status === 204) {
+            articles = articles.filter((a) => a.id !== article.id);
+            refreshArticles();
+          } else {
+            window.alert(genericError);
+          }
+        });
+      } catch (e) {
+        window.alert(genericError);
+      }
     }
   });
 
   let saveButton = document.createElement("button");
   saveButton.textContent = "Save";
-  saveButton.addEventListener("click", () => {
+  saveButton.className = "btn btn-save";
+  saveButton.id = "btn-save";
+  saveButton.addEventListener("click", async () => {
+    disableInputs(true);
     editMode = false;
     editedArticleId = null;
     const articleIndex = articles.findIndex((a) => a.id === article.id);
@@ -93,18 +124,48 @@ const generateArticleDiv = (article) => {
       body: newBody,
       published: newPublished,
     };
-    // TODO: Add checks for article, required content and its type (title + body)
-    if (article.id === "new") {
-      createArticle(newArticle);
+
+    // Check if the types are correct
+    if (
+      typeof newArticle.title === "string" &&
+      typeof newArticle.body === "string" &&
+      typeof newArticle.published === "boolean"
+    ) {
+      // Check if the title and body have value
+      if (newArticle.title.trim() && newArticle.body.trim()) {
+        if (article.id === "new") {
+          try {
+            let data = await createArticle(newArticle);
+            articles[articles.length - 1] = data;
+            refreshArticles();
+          } catch (e) {
+            window.alert(genericError);
+          }
+        } else {
+          try {
+            await updateArticle(newArticle).then(
+              (article) => (articles[articleIndex] = article)
+            );
+            refreshArticles();
+          } catch (e) {
+            window.alert(genericError);
+          }
+        }
+      } else {
+        window.alert("The article requires title and body.");
+      }
     } else {
-      updateArticle(newArticle);
+      window.alert(
+        "The article is corrupted. Please refresh the window and try again."
+      );
     }
-    articles[articleIndex] = newArticle;
-    refreshArticles();
+    disableInputs(false);
   });
 
   let cancelButton = document.createElement("button");
   cancelButton.textContent = "Cancel";
+  cancelButton.className = "btn btn-cancel";
+  cancelButton.id = "btn-cancel";
   cancelButton.addEventListener("click", () => {
     editMode = false;
     editedArticleId = null;
@@ -134,6 +195,12 @@ const generateArticleDiv = (article) => {
   return articleDiv;
 };
 
+const disableInputs = (boolean) => {
+  document
+    .querySelectorAll("button, input, textarea")
+    .forEach((btn) => (btn.disabled = boolean));
+};
+
 const refreshArticles = () => {
   articlesContainer.innerHTML = "";
   articles.forEach((article) => {
@@ -143,6 +210,7 @@ const refreshArticles = () => {
   // New article button
   let newArticleButton = document.createElement("button");
   newArticleButton.textContent = "New article";
+  newArticleButton.id = `btn-new`;
   newArticleButton.addEventListener("click", () => {
     articles.push({
       id: "new",
@@ -160,41 +228,27 @@ const refreshArticles = () => {
 };
 
 const createArticle = async (article) => {
-  await fetch(baseURL, {
+  const data = await fetch(baseURL, {
     method: "POST",
     body: JSON.stringify(article),
     headers: { "Content-Type": "application/json" },
-  })
-    .then((res) => {
-      if (res.status === 201) {
-        return res.json();
-      }
-    })
-    .then((data) => {
-      articles[articles.length - 1] = data;
-      refreshArticles();
-    });
+  });
+  const json = await data.json();
+  return json;
 };
 
 const updateArticle = async (article) => {
-  await fetch(`${baseURL}/${article.id}`, {
+  const res = await fetch(`${baseURL}/${article.id}`, {
     method: "PATCH",
     body: JSON.stringify(article),
     headers: { "Content-Type": "application/json" },
-  }).then((res) => {
-    if (res.status === 200) {
-      return true;
-    }
   });
+  const json = await res.json();
+  return json;
 };
 
 const removeArticle = async (article) => {
-  await fetch(`${baseURL}/${article.id}`, {
+  return await fetch(`${baseURL}/${article.id}`, {
     method: "DELETE",
-  }).then((res) => {
-    if (res.status === 204) {
-      articles = articles.filter((a) => a.id !== article.id);
-      refreshArticles();
-    }
   });
 };

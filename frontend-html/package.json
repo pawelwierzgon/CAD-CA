@@ -1,18 +1,23 @@
 {
-  "name": "frontend-html",
+  "name": "html-front",
   "version": "1.0.0",
+  "description": "",
   "main": "script.js",
-  "directories": {
-    "test": "test"
+  "scripts": {
+    "test": "concurrently -n backend,frontend,test \"npm run start-backend\" \"npm run start-frontend\" \"npm run start-test\" -k -s test",
+    "start-backend": "cd ../backend/ && rails server -p 5000",
+    "start-frontend": "wait-on http://localhost:5000/articles && live-server --port=5500 --no-browser",
+    "start-test": "wait-on http://localhost:5500/ && node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
+    "just-test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit"
   },
   "type": "module",
-  "scripts": {
-    "test": "jest"
-  },
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
-    "jest": "^29.7.0"
+    "concurrently": "^8.2.2",
+    "jest": "^29.7.0",
+    "live-server": "^1.2.2",
+    "puppeteer": "^22.7.0",
+    "wait-on": "^7.2.0"
   }
 }
