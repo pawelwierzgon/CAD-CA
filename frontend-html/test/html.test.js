@@ -3,12 +3,12 @@ import puppeteer from "puppeteer";
 // Launch the browser and open a new blank page
 const browser = await puppeteer.launch({ headless: true });
 const page = await browser.newPage();
-page.setDefaultTimeout(0);
+page.setDefaultTimeout(5000);
 
 // Navigate the page to a URL
 await page.goto("http://localhost:5500/", {
   waitUntil: "load",
-  timeout: 5000,
+  timeout: 60000,
 });
 
 // Set screen size (change headless to false to see the window)

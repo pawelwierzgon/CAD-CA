@@ -1,3 +1,4 @@
+import API from "./utils/API.js";
 const articlesContainer = document.querySelector("#articles-container");
 
 const baseURL = "http://localhost:5000/articles";
@@ -7,16 +8,10 @@ let editedArticleId = null;
 
 let genericError = "Something went wrong. Please try again later.";
 
-const getArticles = async () => {
-  const data = await fetch(baseURL);
-  const json = await data.json();
-  return json;
-};
-
 // Load the articles when the page is loaded
 (async () => {
   try {
-    await getArticles().then((data) => {
+    await API.getArticles().then((data) => {
       articles = data;
       refreshArticles();
     });
@@ -86,7 +81,7 @@ const generateArticleDiv = (article) => {
   removeButton.addEventListener("click", async () => {
     if (window.confirm("Are you sure you want to remove this article?")) {
       try {
-        await removeArticle(article).then((res) => {
+        await API.removeArticle(article).then((res) => {
           if (res.status === 204) {
             articles = articles.filter((a) => a.id !== article.id);
             refreshArticles();
@@ -108,34 +103,35 @@ const generateArticleDiv = (article) => {
     disableInputs(true);
     editMode = false;
     editedArticleId = null;
-    const articleIndex = articles.findIndex((a) => a.id === article.id);
+    const articleIndex = articles.findIndex((a) => a.id === article?.id);
     let newTitle = document.querySelector(
-      `input[data-article-id="${article.id}"]`
+      `input[data-article-id="${article?.id}"]`
     ).value;
     let newBody = document.querySelector(
-      `textarea[data-article-id="${article.id}"]`
+      `textarea[data-article-id="${article?.id}"]`
     ).value;
     let newPublished = document.querySelector(
-      `input[type="checkbox"][data-article-id="${article.id}"]`
+      `input[type="checkbox"][data-article-id="${article?.id}"]`
     ).checked;
     let newArticle = {
-      id: article.id,
+      id: article?.id,
       title: newTitle,
       body: newBody,
       published: newPublished,
     };
 
-    // Check if the types are correct
+    // Check if the types are correct and if the id exists
     if (
       typeof newArticle.title === "string" &&
       typeof newArticle.body === "string" &&
-      typeof newArticle.published === "boolean"
+      typeof newArticle.published === "boolean" &&
+      newArticle?.id
     ) {
-      // Check if the title and body have value
+      // Check if the title, body, and id have value
       if (newArticle.title.trim() && newArticle.body.trim()) {
         if (article.id === "new") {
           try {
-            let data = await createArticle(newArticle);
+            let data = await API.createArticle(newArticle);
             articles[articles.length - 1] = data;
             refreshArticles();
           } catch (e) {
@@ -143,7 +139,7 @@ const generateArticleDiv = (article) => {
           }
         } else {
           try {
-            await updateArticle(newArticle).then(
+            await API.updateArticle(newArticle).then(
               (article) => (articles[articleIndex] = article)
             );
             refreshArticles();
@@ -225,30 +221,4 @@ const refreshArticles = () => {
   if (!editMode) {
     articlesContainer.appendChild(newArticleButton);
   }
-};
-
-const createArticle = async (article) => {
-  const data = await fetch(baseURL, {
-    method: "POST",
-    body: JSON.stringify(article),
-    headers: { "Content-Type": "application/json" },
-  });
-  const json = await data.json();
-  return json;
-};
-
-const updateArticle = async (article) => {
-  const res = await fetch(`${baseURL}/${article.id}`, {
-    method: "PATCH",
-    body: JSON.stringify(article),
-    headers: { "Content-Type": "application/json" },
-  });
-  const json = await res.json();
-  return json;
-};
-
-const removeArticle = async (article) => {
-  return await fetch(`${baseURL}/${article.id}`, {
-    method: "DELETE",
-  });
 };
