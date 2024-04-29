@@ -3,13 +3,11 @@
     box-sizing: border-box;
 }
 
-h2 {
-    margin: 0;
-}
-
 body {
     margin: 0;
     color: #eee;
+    background: rgb(34,193,195);
+    background: linear-gradient(81deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);
 }
 
 textarea, input[type="text"] {
@@ -17,7 +15,6 @@ textarea, input[type="text"] {
 }
 
 textarea {
-    /* min-height: 300px; */
     height: 300px;
 }
 
@@ -40,12 +37,14 @@ button {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
-    background-color: rgb(148, 148, 148);
 }
 
 #articles-container {
     width: 100%; height: auto;
     padding: 20px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
 }
 
 .article {
@@ -59,4 +58,5 @@ button {
 
 .bold {
     font-weight: 800;
+    line-height: 0;
 }

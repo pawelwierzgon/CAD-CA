@@ -188,10 +188,16 @@ function App({ articlesAPI }) {
 
   return (
     <div className="main-container">
-      {error && <ErrorPopup error={error} clearError={() => setError("")} />}
-      {isLoading && <div>Loading data...</div>}
       <h1>Article Management System</h1>
-      {articles.length === 0 && <p>No available articles</p>}
+      {error && <ErrorPopup error={error} clearError={() => setError("")} />}
+      {(isLoading || articles.length === 0) && (
+        <div className="article">
+          {isLoading && <div>Loading data...</div>}
+          {!isLoading && articles.length === 0 && (
+            <div>No available articles</div>
+          )}
+        </div>
+      )}
       {!isLoading && articles.length > 0 && (
         <div>
           {articles[0]?.id !== "new" && (

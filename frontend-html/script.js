@@ -1,7 +1,6 @@
 import API from "./utils/API.js";
 const articlesContainer = document.querySelector("#articles-container");
 
-const baseURL = "http://localhost:5000/articles";
 let articles = [];
 let editMode = false;
 let editedArticleId = null;
@@ -81,15 +80,18 @@ const generateArticleDiv = (article) => {
   removeButton.addEventListener("click", async () => {
     if (window.confirm("Are you sure you want to remove this article?")) {
       try {
+        disableInputs(true);
         await API.removeArticle(article).then((res) => {
           if (res.status === 204) {
             articles = articles.filter((a) => a.id !== article.id);
             refreshArticles();
           } else {
+            disableInputs(false);
             window.alert(genericError);
           }
         });
       } catch (e) {
+        disableInputs(false);
         window.alert(genericError);
       }
     }
@@ -100,7 +102,6 @@ const generateArticleDiv = (article) => {
   saveButton.className = "btn btn-save";
   saveButton.id = "btn-save";
   saveButton.addEventListener("click", async () => {
-    disableInputs(true);
     editMode = false;
     editedArticleId = null;
     const articleIndex = articles.findIndex((a) => a.id === article?.id);
@@ -129,33 +130,37 @@ const generateArticleDiv = (article) => {
     ) {
       // Check if the title, body, and id have value
       if (newArticle.title.trim() && newArticle.body.trim()) {
+        disableInputs(true);
         if (article.id === "new") {
           try {
-            let data = await API.createArticle(newArticle);
-            articles[articles.length - 1] = data;
-            refreshArticles();
+            await API.createArticle(newArticle).then((data) => {
+              articles[articles.length - 1] = data;
+              refreshArticles();
+            });
           } catch (e) {
             window.alert(genericError);
+            disableInputs(false, article.id);
           }
         } else {
           try {
-            await API.updateArticle(newArticle).then(
-              (article) => (articles[articleIndex] = article)
-            );
-            refreshArticles();
+            await API.updateArticle(newArticle).then((article) => {
+              articles[articleIndex] = article;
+              refreshArticles();
+            });
           } catch (e) {
             window.alert(genericError);
+            disableInputs(false, article.id);
           }
         }
       } else {
         window.alert("The article requires title and body.");
+        disableInputs(false, article.id);
       }
     } else {
       window.alert(
         "The article is corrupted. Please refresh the window and try again."
       );
     }
-    disableInputs(false);
   });
 
   let cancelButton = document.createElement("button");
@@ -181,9 +186,9 @@ const generateArticleDiv = (article) => {
   }
 
   // Append elements to the article div container
-  articleDiv.appendChild(addParagraph("Title:", "bold"));
+  articleDiv.appendChild(addParagraph("Title", "bold"));
   articleDiv.appendChild(title);
-  articleDiv.appendChild(addParagraph("Body:", "bold"));
+  articleDiv.appendChild(addParagraph("Body", "bold"));
   articleDiv.appendChild(body);
   articleDiv.appendChild(publishedDiv);
   articleDiv.appendChild(buttonsSection);
@@ -191,10 +196,25 @@ const generateArticleDiv = (article) => {
   return articleDiv;
 };
 
-const disableInputs = (boolean) => {
-  document
-    .querySelectorAll("button, input, textarea")
-    .forEach((btn) => (btn.disabled = boolean));
+const disableInputs = (boolean, articleId) => {
+  // Disable all inputs
+  if (boolean) {
+    document
+      .querySelectorAll("button, input, textarea")
+      .forEach((el) => (el.disabled = true));
+  } else if (!boolean && articleId) {
+    // Enable inputs for a given article
+    document
+      .querySelectorAll(
+        `input[data-article-id="${articleId}"], textarea[data-article-id="${articleId}"], #btn-save, #btn-cancel`
+      )
+      .forEach((el) => (el.disabled = false));
+  } else {
+    // Enable all common buttons (edit, remove, new article)
+    document
+      .querySelectorAll("button")
+      .forEach((btn) => (btn.disabled = false));
+  }
 };
 
 const refreshArticles = () => {

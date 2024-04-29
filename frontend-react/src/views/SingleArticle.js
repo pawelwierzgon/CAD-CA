@@ -25,17 +25,21 @@ const SingleArticle = ({ articlesAPI }) => {
 
   return (
     <div className="main-container">
-      {isLoading && <div>Loading data...</div>}
-      {Object.keys(article).length > 0 && (
-        <div>
-          <p>
-            <span className="bold">{article.title}</span> (Article is
-            {!article.published && " not "} published!)
-          </p>
-          <p>{article.body}</p>
-        </div>
-      )}
-      {error && <ErrorPopup error={error} clearError={() => setError("")} />}
+      <div className="article">
+        {isLoading && <div>Loading data...</div>}
+        {Object.keys(article).length > 0 && (
+          <div>
+            <div className="published-status">
+              {!article.published && "not "}published
+            </div>
+            <p>
+              <span className="bold">{article.title}</span>
+            </p>
+            <p>{article.body}</p>
+          </div>
+        )}
+        {error && <ErrorPopup error={error} clearError={() => setError("")} />}
+      </div>
     </div>
   );
 };
