@@ -31,6 +31,11 @@ const generateArticleDiv = (article) => {
   let articleDiv = document.createElement("div");
   articleDiv.dataset.articleId = article.id;
   articleDiv.className = "article";
+
+  let idDiv = document.createElement("div");
+  idDiv.className = "article-id";
+  idDiv.innerText = `#${article.id}`;
+
   let title = document.createElement("p");
   let body = document.createElement("p");
   let publishedDiv = document.createElement("div");
@@ -186,6 +191,7 @@ const generateArticleDiv = (article) => {
   }
 
   // Append elements to the article div container
+  articleDiv.appendChild(idDiv);
   articleDiv.appendChild(addParagraph("Title", "bold"));
   articleDiv.appendChild(title);
   articleDiv.appendChild(addParagraph("Body", "bold"));

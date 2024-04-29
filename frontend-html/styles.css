@@ -48,12 +48,24 @@ button {
 }
 
 .article {
+    position: relative;
     color: #111;
     background-color: #eee;
-    width: 100%;
+    width: 500px;
     border-radius: 20px;
     padding: 20px;
     margin-bottom: 20px;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+}
+
+.article-id {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0,0,0,0.5);
+    color: #eee;
+    padding: 2px 10px;
+    border-radius: 20px;
 }
 
 .bold {
