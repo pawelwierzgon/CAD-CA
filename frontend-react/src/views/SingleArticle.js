@@ -38,8 +38,8 @@ const SingleArticle = ({ articlesAPI }) => {
             <p>{article.body}</p>
           </div>
         )}
-        {error && <ErrorPopup error={error} clearError={() => setError("")} />}
       </div>
+      {error && <ErrorPopup error={error} clearError={() => setError("")} />}
     </div>
   );
 };
