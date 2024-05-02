@@ -1,11 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  title: MyString
-  body: MyText
+  title: First Article
+  body: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
   published: false
 
 two:
-  title: MyString
-  body: MyText
+  title: Second Article
+  body: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
   published: false
