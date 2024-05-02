@@ -19,37 +19,55 @@ const Article = ({
           <Link to={`/articles/${article.id}`}>#{article.id}</Link>
         )}
       </div>
-      <p>
-        <span className="bold">Title</span>
-        <br />
+      <div>
         {edited ? (
-          <input
-            type="text"
-            value={article.title}
-            disabled={isUpdating}
-            onChange={(e) =>
-              handleArticleChange({ ...article, title: e.target.value })
-            }
-          ></input>
+          <p>
+            <label htmlFor={`title-${article.id}`} className="bold">
+              Title
+            </label>
+            <br />
+            <input
+              id={`title-${article.id}`}
+              type="text"
+              value={article.title}
+              disabled={isUpdating}
+              onChange={(e) =>
+                handleArticleChange({ ...article, title: e.target.value })
+              }
+            ></input>
+          </p>
         ) : (
-          <span> {article.title}</span>
+          <p>
+            <span className="bold">Title</span>
+            <br />
+            <span> {article.title}</span>
+          </p>
         )}
-      </p>
-      <p>
-        <span className="bold">Body</span>
-        <br />
+      </div>
+      <div>
         {edited ? (
-          <textarea
-            value={article.body}
-            disabled={isUpdating}
-            onChange={(e) =>
-              handleArticleChange({ ...article, body: e.target.value })
-            }
-          ></textarea>
+          <p>
+            <label for={`body-${article.id}`} className="bold">
+              Body
+            </label>
+            <br />
+            <textarea
+              id={`body-${article.id}`}
+              value={article.body}
+              disabled={isUpdating}
+              onChange={(e) =>
+                handleArticleChange({ ...article, body: e.target.value })
+              }
+            ></textarea>
+          </p>
         ) : (
-          <span> {article.body}</span>
+          <p>
+            <span className="bold">Body</span>
+            <br />
+            <span> {article.body}</span>
+          </p>
         )}
-      </p>
+      </div>
       <label htmlFor={`publish-checkbox-${article.id}`} className="bold">
         Published
       </label>
@@ -77,6 +95,7 @@ const Article = ({
         )}
         {edited && (
           <button
+            id="btn-save"
             disabled={isUpdating}
             onClick={(e) => {
               e.preventDefault();
@@ -92,6 +111,7 @@ const Article = ({
         )}
         {edited && (
           <button
+            id="btn-cancel"
             disabled={isUpdating}
             onClick={(e) => {
               e.preventDefault();
@@ -103,6 +123,7 @@ const Article = ({
         )}
         {!editMode && (
           <button
+            id={`btn-remove-${article.id}`}
             disabled={isUpdating}
             onClick={(e) => {
               e.preventDefault();

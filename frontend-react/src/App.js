@@ -191,7 +191,7 @@ function App({ articlesAPI }) {
       <h1>Article Management System</h1>
       {error && <ErrorPopup error={error} clearError={() => setError("")} />}
       {(isLoading || articles.length === 0) && (
-        <div className="article">
+        <div className="generic">
           {isLoading && <div>Loading data...</div>}
           {!isLoading && articles.length === 0 && (
             <div>No available articles</div>
@@ -219,7 +219,7 @@ function App({ articlesAPI }) {
           />
         </div>
       )}
-      {!editMode && (
+      {!editMode && !isLoading && (
         <button
           disabled={isUpdating}
           onClick={(e) => {
